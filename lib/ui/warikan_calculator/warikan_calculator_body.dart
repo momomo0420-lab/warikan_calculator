@@ -26,7 +26,20 @@ class WarikanCalculatorBody extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
 
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Text('金額は税別ですか？'),
+              Switch(
+                value: true, //TODO: 後で変更
+                onChanged: (tax) {}, //TODO: 後で変更
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+
           TextFormField(
+            enabled: true, //TODO: 後で変更
             controller: null, //TODO: 後で変更
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -55,6 +68,13 @@ class WarikanCalculatorBody extends StatelessWidget {
                 icon: Icon(Icons.clear),
               ),
             ),
+          ),
+          const SizedBox(height: 32.0),
+
+          //TODO: 後で変更
+          const Text(
+            'ここに結果が表示されます。',
+            style: TextStyle(fontSize: 24.0),
           ),
         ],
       ),
