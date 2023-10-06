@@ -42,3 +42,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/lib/ui/warikan_calculator/warikan_calculator_viewmodel_state.freezed.dart
