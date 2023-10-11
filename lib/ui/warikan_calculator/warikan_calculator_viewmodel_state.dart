@@ -16,9 +16,9 @@ class WarikanCalculatorViewModelState with _$WarikanCalculatorViewModelState {
     required TextEditingController numberController,
     /// 税率の有無
     /// ```
-    ///   true => 税込み価格
-    ///   false => 税別価格
+    ///   true => 税別価格
+    ///   false => 税込み価格
     /// ```
-    required bool isTaxIncluded,
+    required bool isWithoutTax,
   }) = _WarikanCalculatorViewModelState;
 }

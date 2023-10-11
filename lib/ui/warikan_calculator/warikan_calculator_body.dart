@@ -35,10 +35,11 @@ class WarikanCalculatorBody extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text('金額は税込み価格ですか？'),
+                const Text('金額は税別価格ですか？'),
                 Switch(
-                  value: _state.isTaxIncluded,
-                  onChanged: (axIncluded) => _viewModel.setTaxIncluded(axIncluded),
+                  value: _state.isWithoutTax,
+                  onChanged: (isWithoutTax) => _viewModel.setWithoutTax(isWithoutTax),
+                  activeColor: Colors.blue,
                 ),
               ],
             ),
@@ -46,7 +47,7 @@ class WarikanCalculatorBody extends StatelessWidget {
 
             // 税率入力フォーム
             _buildTextFormField(
-              !_state.isTaxIncluded,
+              _state.isWithoutTax,
               _state.taxRateController,
               '税率',
               '％',
@@ -66,13 +67,8 @@ class WarikanCalculatorBody extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () => _viewModel.calculateAmountPerPerson(
-                (result) => showDialog(
-                  context: context,
-                  builder: (context) => _buildAlertDialog(context, result),
-                ),
-                () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('入力されてない項目があります。'))
-                ),
+                (result) => _showResultDialog(context, result),
+                (message) => _showFailureSnackBar(context, message),
               ),
               child: const Text('計算する'),
             )
@@ -111,19 +107,31 @@ class WarikanCalculatorBody extends StatelessWidget {
     );
   }
 
-  AlertDialog _buildAlertDialog(
+  void _showResultDialog(
     BuildContext context,
     double result,
   ) {
-    return AlertDialog(
-      title: const Text('計算結果'),
-      content: Text('一人当たりの金額は $result 円です。'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        )
-      ],
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('計算結果'),
+        content: Text('一人当たりの金額は $result 円です。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showFailureSnackBar(
+    BuildContext context,
+    String message,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message))
     );
   }
 }

@@ -14,15 +14,15 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
       amountController: TextEditingController(),
       taxRateController: TextEditingController(),
       numberController: TextEditingController(),
-      isTaxIncluded: false,
+      isWithoutTax: false,
     );
   }
 
   /// 税率の有無を設定する
   ///
-  /// [taxIncluded]を基に税率の有無を設定する
-  void setTaxIncluded(bool taxIncluded) {
-    state = state.copyWith(isTaxIncluded: taxIncluded);
+  /// [isWithoutTax]を基に税率の有無を設定する
+  void setWithoutTax(bool isWithoutTax) {
+    state = state.copyWith(isWithoutTax: isWithoutTax);
   }
 
   void clearAmountController() {
@@ -48,7 +48,7 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
     }
 
     // 税別価格なのに税率が入力されていない場合は無効
-    if(!state.isTaxIncluded && (state.taxRateController.text == "")) {
+    if(state.isWithoutTax && (state.taxRateController.text == "")) {
       result = false;
     }
 
@@ -58,22 +58,26 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
   /// 割り勘金額を計算する
   void calculateAmountPerPerson(
     Function(double result)? onSuccess,
-    Function()? onFailure
+    Function(String message)? onFailure
   ) {
     if(!_checkAllFieldEntered()) {
-      if(onFailure != null) onFailure();
+      if(onFailure != null) onFailure('入力されていない項目があります。');
+      return;
+    }
+
+    final number = int.parse(state.numberController.text);
+    if(number == 0) {
+      if(onFailure != null) onFailure('人数０人は入力できません。');
       return;
     }
 
     var amount = double.parse(state.amountController.text);
 
-    if(!state.isTaxIncluded) {
+    if(state.isWithoutTax) {
       final taxRate = int.parse(state.taxRateController.text);
       final tax = amount * taxRate / 100;
       amount += tax;
     }
-
-    final number = int.parse(state.numberController.text);
 
     if(onSuccess != null) onSuccess(amount / number);
   }
