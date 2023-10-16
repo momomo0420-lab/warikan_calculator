@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel_state.dart';
 
@@ -10,10 +9,7 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
   /// 初期化処理
   @override
   WarikanCalculatorViewModelState build() {
-    return WarikanCalculatorViewModelState(
-      amountController: TextEditingController(),
-      taxRateController: TextEditingController(),
-      numberController: TextEditingController(),
+    return const WarikanCalculatorViewModelState(
       isWithoutTax: false,
     );
   }
@@ -25,30 +21,21 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
     state = state.copyWith(isWithoutTax: isWithoutTax);
   }
 
-  void clearAmountController() {
-    state.amountController.clear();
-  }
-
-  void clearTaxRateController() {
-    state.taxRateController.clear();
-  }
-
-  void clearNumberController() {
-    state.numberController.clear();
-  }
-
   /// 必要なすべての項目の入力が終わっているか判定する
-  bool _checkAllFieldEntered() {
+  bool _checkAllFieldEntered(
+    String amountText,
+    String taxRateText,
+    String numberText,
+  ) {
     var result = true;
 
     // 金額と人数が入力されていない場合は無効
-    if((state.amountController.text == "") ||
-        (state.numberController.text == "")) {
+    if((amountText == "") || (numberText == "")) {
       result = false;
     }
 
     // 税別価格なのに税率が入力されていない場合は無効
-    if(state.isWithoutTax && (state.taxRateController.text == "")) {
+    if(state.isWithoutTax && (taxRateText == "")) {
       result = false;
     }
 
@@ -56,29 +43,41 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
   }
 
   /// 割り勘金額を計算する
-  void calculateAmountPerPerson(
+  void calculateAmountPerPerson({
+    required String amountText,
+    required String taxRateText,
+    required String numberText,
     Function(double result)? onSuccess,
-    Function(String message)? onFailure
-  ) {
-    if(!_checkAllFieldEntered()) {
-      if(onFailure != null) onFailure('入力されていない項目があります。');
+    Function(CalculationError error)? onFailure,
+  }) {
+    if(!_checkAllFieldEntered(amountText, taxRateText, numberText)) {
+      if(onFailure != null) onFailure(CalculationError.notEntered);
       return;
     }
 
-    final number = int.parse(state.numberController.text);
+    final number = int.parse(numberText);
     if(number == 0) {
-      if(onFailure != null) onFailure('人数０人は入力できません。');
+      if(onFailure != null) onFailure(CalculationError.divisionByZero);
       return;
     }
 
-    var amount = double.parse(state.amountController.text);
+    var amount = int.parse(amountText);
 
     if(state.isWithoutTax) {
-      final taxRate = int.parse(state.taxRateController.text);
-      final tax = amount * taxRate / 100;
+      final taxRate = int.parse(taxRateText);
+      final tax = amount * taxRate ~/ 100;
       amount += tax;
     }
 
     if(onSuccess != null) onSuccess(amount / number);
   }
+}
+
+enum CalculationError {
+  notEntered(1),
+  divisionByZero(2);
+
+  final int id;
+
+  const CalculationError(this.id);
 }
