@@ -46,7 +46,7 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
 
   /// 割り勘金額を計算する
   void calculateAmountPerPerson({
-    Function(double result)? onSuccess,
+    Function(int result)? onSuccess,
     Function()? onFailure,
   }) {
     final number = int.parse(state.number);
@@ -63,6 +63,8 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
       amount += tax.ceil();
     }
 
-    if(onSuccess != null) onSuccess(amount / number);
+    final amountPerPerson = amount / number;
+
+    if(onSuccess != null) onSuccess(amountPerPerson.ceil());
   }
 }

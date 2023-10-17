@@ -112,7 +112,7 @@ class WarikanCalculatorBody extends HookConsumerWidget {
 
   void _showResultDialog(
     BuildContext context,
-    double result,
+    int result,
   ) {
     showDialog(
       context: context,
