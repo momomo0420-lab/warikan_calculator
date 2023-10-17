@@ -7,11 +7,13 @@ part 'warikan_calculator_viewmodel_state.freezed.dart';
 class WarikanCalculatorViewModelState with _$WarikanCalculatorViewModelState {
   /// コンストラクタ
   const factory WarikanCalculatorViewModelState({
-    /// 税率の有無
-    /// ```
-    ///   true => 税別価格
-    ///   false => 税込み価格
-    /// ```
-    required bool isWithoutTax,
+    @Default('')
+    String amount,
+    @Default('')
+    String taxRate,
+    @Default('')
+    String number,
+    @Default(false)
+    bool withoutTax,
   }) = _WarikanCalculatorViewModelState;
 }

@@ -12,9 +12,9 @@ class WarikanCalculatorBody extends HookConsumerWidget {
     final viewModel = ref.read(warikanCalculatorViewModelProvider.notifier);
     final state = ref.watch(warikanCalculatorViewModelProvider);
 
-    final amountController = useTextEditingController(text: "");
-    final taxRateController = useTextEditingController(text: "");
-    final numberController = useTextEditingController(text: "");
+    final amountController = useTextEditingController(text: '');
+    final taxRateController = useTextEditingController(text: '');
+    final numberController = useTextEditingController(text: '');
 
     return SingleChildScrollView(
       child: Column(
@@ -25,6 +25,8 @@ class WarikanCalculatorBody extends HookConsumerWidget {
             controller: amountController,
             label: '金額',
             unit: '円',
+            onChanged: (amount) => viewModel.setAmount(amount),
+            onClear: () => viewModel.setAmount(''),
           ),
           const SizedBox(height: 16.0),
 
@@ -34,8 +36,8 @@ class WarikanCalculatorBody extends HookConsumerWidget {
             children: [
               const Text('金額は税別価格ですか？'),
               Switch(
-                value: state.isWithoutTax,
-                onChanged: (isWithoutTax) => viewModel.setWithoutTax(isWithoutTax),
+                value: state.withoutTax,
+                onChanged: (withoutTax) => viewModel.setWithoutTax(withoutTax),
                 activeColor: Colors.blue,
               ),
             ],
@@ -44,10 +46,12 @@ class WarikanCalculatorBody extends HookConsumerWidget {
 
           // 税率入力フォーム
           _buildTextFormField(
-            enabled: state.isWithoutTax,
+            enabled: state.withoutTax,
             controller: taxRateController,
             label: '税率',
             unit: '％',
+            onChanged: (taxRate) => viewModel.setTaxRate(taxRate),
+            onClear: () => viewModel.setTaxRate(''),
           ),
           const SizedBox(height: 16.0),
 
@@ -57,17 +61,17 @@ class WarikanCalculatorBody extends HookConsumerWidget {
             controller: numberController,
             label: '人数',
             unit: '人',
+            onChanged: (number) => viewModel.setNumber(number),
+            onClear: () => viewModel.setNumber(''),
           ),
           const SizedBox(height: 32.0),
 
           ElevatedButton(
-            onPressed: () => viewModel.calculateAmountPerPerson(
-              amountText: amountController.text,
-              taxRateText: taxRateController.text,
-              numberText: numberController.text,
-              onSuccess: (result) => _showResultDialog(context, result),
-              onFailure: (error) => _showFailureSnackBar(context, error),
-            ),
+            onPressed: !viewModel.isCalculable() ? null :
+              () => viewModel.calculateAmountPerPerson(
+                onSuccess: (result) => _showResultDialog(context, result),
+                onFailure: () => _showFailureSnackBar(context),
+              ),
             child: const Text('計算する'),
           )
         ],
@@ -80,6 +84,8 @@ class WarikanCalculatorBody extends HookConsumerWidget {
     required TextEditingController controller,
     required String label,
     required String unit,
+    Function(String)? onChanged,
+    Function()? onClear,
   }) {
     return TextFormField(
       enabled: enabled,
@@ -91,10 +97,16 @@ class WarikanCalculatorBody extends HookConsumerWidget {
         hintText: '$labelを入力してください。',
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
-          onPressed: () => controller.clear(),
+          onPressed: () {
+            controller.clear();
+            if(onClear != null) onClear();
+          },
           icon: const Icon(Icons.clear),
         ),
       ),
+      onChanged: (value) {
+        if(onChanged != null) onChanged(value);
+      }
     );
   }
 
@@ -119,21 +131,9 @@ class WarikanCalculatorBody extends HookConsumerWidget {
 
   void _showFailureSnackBar(
     BuildContext context,
-    CalculationError error,
   ) {
-    String message = '';
-
-    switch(error) {
-      case CalculationError.divisionByZero:
-        message = '人数０人は入力できません。';
-        break;
-      case CalculationError.notEntered:
-        message = '未入力の項目があります。';
-        break;
-    }
-
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message))
+      const SnackBar(content: Text('人数０人は入力できません。'))
     );
   }
 }

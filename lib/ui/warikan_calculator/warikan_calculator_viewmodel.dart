@@ -9,33 +9,35 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
   /// 初期化処理
   @override
   WarikanCalculatorViewModelState build() {
-    return const WarikanCalculatorViewModelState(
-      isWithoutTax: false,
-    );
+    return const WarikanCalculatorViewModelState();
   }
 
-  /// 税率の有無を設定する
-  ///
-  /// [isWithoutTax]を基に税率の有無を設定する
-  void setWithoutTax(bool isWithoutTax) {
-    state = state.copyWith(isWithoutTax: isWithoutTax);
+  void setAmount(String amount) {
+    state = state.copyWith(amount: amount);
+  }
+
+  void setTaxRate(String taxRate) {
+    state = state.copyWith(taxRate: taxRate);
+  }
+
+  void setNumber(String number) {
+    state = state.copyWith(number: number);
+  }
+  void setWithoutTax(bool withoutTax) {
+    state = state.copyWith(withoutTax: withoutTax);
   }
 
   /// 必要なすべての項目の入力が終わっているか判定する
-  bool _checkAllFieldEntered(
-    String amountText,
-    String taxRateText,
-    String numberText,
-  ) {
+  bool isCalculable() {
     var result = true;
 
     // 金額と人数が入力されていない場合は無効
-    if((amountText == "") || (numberText == "")) {
+    if((state.amount == '') || (state.number == '')) {
       result = false;
     }
 
     // 税別価格なのに税率が入力されていない場合は無効
-    if(state.isWithoutTax && (taxRateText == "")) {
+    if(state.withoutTax && (state.taxRate == '')) {
       result = false;
     }
 
@@ -44,40 +46,23 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
 
   /// 割り勘金額を計算する
   void calculateAmountPerPerson({
-    required String amountText,
-    required String taxRateText,
-    required String numberText,
     Function(double result)? onSuccess,
-    Function(CalculationError error)? onFailure,
+    Function()? onFailure,
   }) {
-    if(!_checkAllFieldEntered(amountText, taxRateText, numberText)) {
-      if(onFailure != null) onFailure(CalculationError.notEntered);
-      return;
-    }
-
-    final number = int.parse(numberText);
+    final number = int.parse(state.number);
     if(number == 0) {
-      if(onFailure != null) onFailure(CalculationError.divisionByZero);
+      if(onFailure != null) onFailure();
       return;
     }
 
-    var amount = int.parse(amountText);
+    var amount = int.parse(state.amount);
 
-    if(state.isWithoutTax) {
-      final taxRate = int.parse(taxRateText);
-      final tax = amount * taxRate ~/ 100;
-      amount += tax;
+    if(state.withoutTax) {
+      final taxRate = int.parse(state.taxRate);
+      final tax = amount * taxRate / 100;
+      amount += tax.ceil();
     }
 
     if(onSuccess != null) onSuccess(amount / number);
   }
-}
-
-enum CalculationError {
-  notEntered(1),
-  divisionByZero(2);
-
-  final int id;
-
-  const CalculationError(this.id);
 }
