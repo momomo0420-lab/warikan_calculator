@@ -12,19 +12,13 @@ class WarikanCalculatorBody extends HookConsumerWidget {
     final viewModel = ref.read(warikanCalculatorViewModelProvider.notifier);
     final state = ref.watch(warikanCalculatorViewModelProvider);
 
-    final amountController = useTextEditingController(text: '');
-    final taxRateController = useTextEditingController(text: '');
-    final numberController = useTextEditingController(text: '');
-
     return SingleChildScrollView(
       child: Column(
         children: [
           // 金額入力フォーム
           _buildTextFormField(
-            enabled: true,
-            controller: amountController,
-            label: '金額',
-            unit: '円',
+            label: '金額(円)',
+            hint: '金額を入力してください。',
             onChanged: (amount) => viewModel.setAmount(amount),
             onClear: () => viewModel.setAmount(''),
           ),
@@ -47,9 +41,8 @@ class WarikanCalculatorBody extends HookConsumerWidget {
           // 税率入力フォーム
           _buildTextFormField(
             enabled: state.withoutTax,
-            controller: taxRateController,
-            label: '税率',
-            unit: '％',
+            label: '税率(％)',
+            hint: '税率を入力してください。',
             onChanged: (taxRate) => viewModel.setTaxRate(taxRate),
             onClear: () => viewModel.setTaxRate(''),
           ),
@@ -57,10 +50,8 @@ class WarikanCalculatorBody extends HookConsumerWidget {
 
           // 人数入力フォーム
           _buildTextFormField(
-            enabled: true,
-            controller: numberController,
-            label: '人数',
-            unit: '人',
+            label: '人数(人)',
+            hint: '人数を入力してください。',
             onChanged: (number) => viewModel.setNumber(number),
             onClear: () => viewModel.setNumber(''),
           ),
@@ -80,21 +71,25 @@ class WarikanCalculatorBody extends HookConsumerWidget {
   }
 
   TextFormField _buildTextFormField({
-    required bool enabled,
-    required TextEditingController controller,
-    required String label,
-    required String unit,
+    bool? enabled,
+    String? initText,
+    String? label,
+    String? hint,
     Function(String)? onChanged,
     Function()? onClear,
   }) {
+    final controller = useTextEditingController(
+      text: (initText == null) ? '' : initText,
+    );
+
     return TextFormField(
-      enabled: enabled,
+      enabled: (enabled == null) ? true : enabled,
       controller: controller,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: InputDecoration(
-        labelText: '$label（$unit）',
-        hintText: '$labelを入力してください。',
+        labelText: label,
+        hintText: hint,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           onPressed: () {
