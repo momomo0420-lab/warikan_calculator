@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel.dart';
-import 'package:warikan_calculator/ui/widget/outline_text_form_field.dart';
+import 'package:warikan_calculator/ui/widget/one_line_text_form_field.dart';
 import 'package:warikan_calculator/ui/widget/labeled_switch.dart';
 
 class WarikanCalculatorBody extends ConsumerWidget {
@@ -15,7 +15,7 @@ class WarikanCalculatorBody extends ConsumerWidget {
     return Column(
       children: [
         // 金額入力フォーム
-        OutlineTextFormField(
+        OneLineTextFormField(
           label: '金額(円)',
           hint: '金額を入力してください。',
           onChanged: (amount) => viewModel.setAmount(amount),
@@ -32,7 +32,7 @@ class WarikanCalculatorBody extends ConsumerWidget {
         const SizedBox(height: 16.0),
 
         // 税率入力フォーム
-        OutlineTextFormField(
+        OneLineTextFormField(
           enabled: state.withoutTax,
           label: '税率(％)',
           hint: '税率を入力してください。',
@@ -42,7 +42,7 @@ class WarikanCalculatorBody extends ConsumerWidget {
         const SizedBox(height: 16.0),
 
         // 人数入力フォーム
-        OutlineTextFormField(
+        OneLineTextFormField(
           label: '人数(人)',
           hint: '人数を入力してください。',
           onChanged: (number) => viewModel.setNumber(number),

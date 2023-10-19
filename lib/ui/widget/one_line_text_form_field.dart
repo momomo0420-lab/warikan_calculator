@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class OutlineTextFormField extends HookWidget {
+class OneLineTextFormField extends HookWidget {
   final bool? _enabled;
   final String? _initText;
   final String? _label;
@@ -10,7 +10,7 @@ class OutlineTextFormField extends HookWidget {
   final Function(String)? _onChanged;
   final Function()? _onClear;
 
-  const OutlineTextFormField({
+  const OneLineTextFormField({
     super.key,
     bool? enabled,
     String? initText,
