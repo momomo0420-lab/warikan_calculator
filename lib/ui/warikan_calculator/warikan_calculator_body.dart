@@ -1,58 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel.dart';
-import 'package:warikan_calculator/ui/widget/one_line_text_form_field.dart';
+import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel_state.dart';
 import 'package:warikan_calculator/ui/widget/labeled_switch.dart';
+import 'package:warikan_calculator/ui/widget/one_line_text_form_field.dart';
 
-class WarikanCalculatorBody extends ConsumerWidget {
-  const WarikanCalculatorBody({super.key});
+class WarikanCalculatorBody extends HookWidget {
+  final WarikanCalculatorViewModel _viewModel;
+  final WarikanCalculatorViewModelState _state;
+
+  const WarikanCalculatorBody({
+    super.key,
+    required WarikanCalculatorViewModel viewModel,
+    required WarikanCalculatorViewModelState state,
+  }): _viewModel = viewModel,
+        _state = state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(warikanCalculatorViewModelProvider.notifier);
-    final state = ref.watch(warikanCalculatorViewModelProvider);
+  Widget build(BuildContext context) {
 
     return Column(
       children: [
         // 金額入力フォーム
         OneLineTextFormField(
+          controller: useTextEditingController(),
           label: '金額(円)',
           hint: '金額を入力してください。',
-          onChanged: (amount) => viewModel.setAmount(amount),
-          onClear: () => viewModel.setAmount(''),
+          onChanged: (amount) => _viewModel.setAmount(amount),
+          onClear: () => _viewModel.setAmount(''),
         ),
         const SizedBox(height: 16.0),
 
         // 税込み、税別の切り替えスイッチ
         LabeledSwitch(
           label: '金額は税別価格ですか？',
-          value: state.withoutTax,
-          onChanged: (withoutTax) => viewModel.setWithoutTax(withoutTax),
+          value: _state.withoutTax,
+          onChanged: (withoutTax) => _viewModel.setWithoutTax(withoutTax),
         ),
         const SizedBox(height: 16.0),
 
         // 税率入力フォーム
         OneLineTextFormField(
-          enabled: state.withoutTax,
+          controller: useTextEditingController(),
+          enabled: _state.withoutTax,
           label: '税率(％)',
           hint: '税率を入力してください。',
-          onChanged: (taxRate) => viewModel.setTaxRate(taxRate),
-          onClear: () => viewModel.setTaxRate(''),
+          onChanged: (taxRate) => _viewModel.setTaxRate(taxRate),
+          onClear: () => _viewModel.setTaxRate(''),
         ),
         const SizedBox(height: 16.0),
 
         // 人数入力フォーム
         OneLineTextFormField(
+          controller: useTextEditingController(),
           label: '人数(人)',
           hint: '人数を入力してください。',
-          onChanged: (number) => viewModel.setNumber(number),
-          onClear: () => viewModel.setNumber(''),
+          onChanged: (number) => _viewModel.setNumber(number),
+          onClear: () => _viewModel.setNumber(''),
         ),
         const SizedBox(height: 32.0),
 
         ElevatedButton(
-          onPressed: !viewModel.isCalculable() ? null :
-            () => viewModel.calculateAmountPerPerson(
+          onPressed: !_viewModel.isCalculable() ? null :
+            () => _viewModel.calculateAmountPerPerson(
               onSuccess: (result) => _showResultDialog(context, result),
               onFailure: () => _showFailureSnackBar(context),
             ),
