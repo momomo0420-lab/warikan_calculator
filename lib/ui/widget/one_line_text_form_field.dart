@@ -27,23 +27,23 @@ class OneLineTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        enabled: _enabled,
-        controller: _controller,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          labelText: _label,
-          hintText: _hint,
-          border: const OutlineInputBorder(),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _controller.clear();
-              if(_onClear != null) _onClear!();
-            },
-            icon: const Icon(Icons.clear),
-          ),
+      enabled: _enabled,
+      controller: _controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      decoration: InputDecoration(
+        labelText: _label,
+        hintText: _hint,
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _controller.clear();
+            if(_onClear != null) _onClear!();
+          },
+          icon: const Icon(Icons.clear),
         ),
-        onChanged: _onChanged
+      ),
+      onChanged: _onChanged,
     );
   }
 }

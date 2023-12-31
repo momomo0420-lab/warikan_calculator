@@ -1,70 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel.dart';
-import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel_state.dart';
+import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_state.dart';
+import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_view_model.dart';
 import 'package:warikan_calculator/ui/widget/labeled_switch.dart';
 import 'package:warikan_calculator/ui/widget/one_line_text_form_field.dart';
 
-class WarikanCalculatorBody extends HookWidget {
+class WarikanCalculatorBody extends StatefulWidget {
   final WarikanCalculatorViewModel _viewModel;
-  final WarikanCalculatorViewModelState _state;
+  final WarikanCalculatorState _state;
 
   const WarikanCalculatorBody({
     super.key,
     required WarikanCalculatorViewModel viewModel,
-    required WarikanCalculatorViewModelState state,
+    required WarikanCalculatorState state,
   }): _viewModel = viewModel,
         _state = state;
 
   @override
+  State<WarikanCalculatorBody> createState() => _WarikanCalculatorBodyState();
+}
+
+class _WarikanCalculatorBodyState extends State<WarikanCalculatorBody> {
+  late final TextEditingController _amountController;
+  late final TextEditingController _taxRateController;
+  late final TextEditingController _numberController;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController();
+    _taxRateController = TextEditingController();
+    _numberController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _taxRateController.dispose();
+    _numberController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final viewModel = widget._viewModel;
+    final state = widget._state;
 
     return Column(
       children: [
         // 金額入力フォーム
         OneLineTextFormField(
-          controller: useTextEditingController(),
+          controller: _amountController,
           label: '金額(円)',
           hint: '金額を入力してください。',
-          onChanged: (amount) => _viewModel.setAmount(amount),
-          onClear: () => _viewModel.setAmount(''),
+          onChanged: (amount) => viewModel.setAmount(amount),
+          onClear: () => viewModel.clearAmount(),
         ),
         const SizedBox(height: 16.0),
 
         // 税込み、税別の切り替えスイッチ
         LabeledSwitch(
           label: '金額は税別価格ですか？',
-          value: _state.withoutTax,
-          onChanged: (withoutTax) => _viewModel.setWithoutTax(withoutTax),
+          value: state.isTaxRequired,
+          onChanged: (_) => viewModel.toggleTax(),
         ),
         const SizedBox(height: 16.0),
 
         // 税率入力フォーム
         OneLineTextFormField(
-          controller: useTextEditingController(),
-          enabled: _state.withoutTax,
+          controller: _taxRateController,
+          enabled: state.isTaxRequired,
           label: '税率(％)',
           hint: '税率を入力してください。',
-          onChanged: (taxRate) => _viewModel.setTaxRate(taxRate),
-          onClear: () => _viewModel.setTaxRate(''),
+          onChanged: (taxRate) => viewModel.setTaxRate(taxRate),
+          onClear: () => viewModel.clearTaxRate(),
         ),
         const SizedBox(height: 16.0),
 
         // 人数入力フォーム
         OneLineTextFormField(
-          controller: useTextEditingController(),
+          controller: _numberController,
           label: '人数(人)',
           hint: '人数を入力してください。',
-          onChanged: (number) => _viewModel.setNumber(number),
-          onClear: () => _viewModel.setNumber(''),
+          onChanged: (number) => viewModel.setNumber(number),
+          onClear: () => viewModel.clearNumber(),
         ),
         const SizedBox(height: 32.0),
 
         ElevatedButton(
-          onPressed: !_viewModel.isCalculable() ? null :
-            () => _viewModel.calculateAmountPerPerson(
+          onPressed: !viewModel.isCalculable() ? null :
+            () => viewModel.calculateAmountPerPerson(
               onSuccess: (result) => _showResultDialog(context, result),
-              onFailure: () => _showFailureSnackBar(context),
             ),
           child: const Text('計算する'),
         )
@@ -88,14 +113,6 @@ class WarikanCalculatorBody extends HookWidget {
           )
         ],
       ),
-    );
-  }
-
-  void _showFailureSnackBar(
-    BuildContext context,
-  ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('人数０人は入力できません。'))
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_body.dart';
-import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_viewmodel.dart';
+import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_view_model.dart';
 
 class WarikanCalculatorScreen extends ConsumerWidget {
   const WarikanCalculatorScreen({super.key});

@@ -1,12 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'warikan_calculator_viewmodel_state.freezed.dart';
+part 'warikan_calculator_state.freezed.dart';
 
 /// [WarikanCalculatorViewModel]で使用する状態を定義する。
 @freezed
-class WarikanCalculatorViewModelState with _$WarikanCalculatorViewModelState {
+class WarikanCalculatorState with _$WarikanCalculatorState {
   /// コンストラクタ
-  const factory WarikanCalculatorViewModelState({
+  const factory WarikanCalculatorState({
     @Default('')
     String amount,
     @Default('')
@@ -14,6 +14,6 @@ class WarikanCalculatorViewModelState with _$WarikanCalculatorViewModelState {
     @Default('')
     String number,
     @Default(false)
-    bool withoutTax,
-  }) = _WarikanCalculatorViewModelState;
+    bool isTaxRequired,
+  }) = _WarikanCalculatorState;
 }
