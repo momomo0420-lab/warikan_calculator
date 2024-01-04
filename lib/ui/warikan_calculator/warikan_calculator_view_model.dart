@@ -3,39 +3,51 @@ import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_stat
 
 part 'warikan_calculator_view_model.g.dart';
 
-/// WarikanCalculatorのビューモデル
+/// 割り勘計算画面のビューモデル
 @riverpod
 class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
-  /// 初期化処理
   @override
   WarikanCalculatorState build() {
     return const WarikanCalculatorState();
   }
 
+  /// 金額（状態）を設定する。
+  ///
+  /// [amount]で金額（状態）を更新する。
   void setAmount(String amount) {
     state = state.copyWith(amount: amount);
   }
 
+  /// 金額（状態）を初期化する。
   void clearAmount() {
     setAmount('');
   }
 
+  /// 税率（状態）を設定する。
+  ///
+  /// [taxRate]で税率（状態）を更新する。
   void setTaxRate(String taxRate) {
     state = state.copyWith(taxRate: taxRate);
   }
 
+  /// 税率（状態）を設定する。
   void clearTaxRate() {
     setTaxRate('');
   }
 
+  /// 人数（状態）を設定する。
+  ///
+  /// [number]で人数（状態）を更新する。
   void setNumber(String number) {
     state = state.copyWith(number: number);
   }
 
+  /// 人数（状態）を初期化する。
   void clearNumber() {
     setNumber('');
   }
 
+  /// 税金の有無を切り替える。
   void toggleTax() {
     final isTaxRequired = state.isTaxRequired;
     state = state.copyWith(isTaxRequired: !isTaxRequired);
@@ -68,15 +80,18 @@ class WarikanCalculatorViewModel extends _$WarikanCalculatorViewModel {
   }) {
     var amount = int.parse(state.amount);
 
+    // 税金を計算する
     if(state.isTaxRequired) {
       final taxRate = int.parse(state.taxRate);
       final tax = amount * taxRate / 100;
       amount += tax.ceil();
     }
 
+    // 一人当たりの金額を計算する
     final number = int.parse(state.number);
     final amountPerPerson = amount / number;
 
+    // 一人当たりの金額を返却する
     if(onSuccess != null) onSuccess(amountPerPerson.ceil());
   }
 }

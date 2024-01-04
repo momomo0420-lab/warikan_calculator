@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_body.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_view_model.dart';
 
+/// 割り勘計算画面
 class WarikanCalculatorScreen extends ConsumerWidget {
+  /// 割り勘計算画面を作成する。
   const WarikanCalculatorScreen({super.key});
 
   @override

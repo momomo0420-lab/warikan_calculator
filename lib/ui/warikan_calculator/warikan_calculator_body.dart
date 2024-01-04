@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_state.dart';
 import 'package:warikan_calculator/ui/warikan_calculator/warikan_calculator_view_model.dart';
 import 'package:warikan_calculator/ui/widget/labeled_switch.dart';
 import 'package:warikan_calculator/ui/widget/one_line_text_form_field.dart';
 
-class WarikanCalculatorBody extends StatefulWidget {
+/// 割り勘計算画面の本体
+class WarikanCalculatorBody extends HookWidget {
+  // ビューモデル
   final WarikanCalculatorViewModel _viewModel;
+  // 状態
   final WarikanCalculatorState _state;
 
+  /// 割り勘計算画面の本体を作成する。
+  ///
+  /// [viewModel]と[state]を使用し、表示させる内容やボタン押下時の処理などを決定する。
   const WarikanCalculatorBody({
     super.key,
     required WarikanCalculatorViewModel viewModel,
@@ -16,79 +23,51 @@ class WarikanCalculatorBody extends StatefulWidget {
         _state = state;
 
   @override
-  State<WarikanCalculatorBody> createState() => _WarikanCalculatorBodyState();
-}
-
-class _WarikanCalculatorBodyState extends State<WarikanCalculatorBody> {
-  late final TextEditingController _amountController;
-  late final TextEditingController _taxRateController;
-  late final TextEditingController _numberController;
-
-  @override
-  void initState() {
-    super.initState();
-    _amountController = TextEditingController();
-    _taxRateController = TextEditingController();
-    _numberController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _taxRateController.dispose();
-    _numberController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final viewModel = widget._viewModel;
-    final state = widget._state;
-
     return Column(
       children: [
         // 金額入力フォーム
         OneLineTextFormField(
-          controller: _amountController,
+          controller: useTextEditingController(),
           label: '金額(円)',
           hint: '金額を入力してください。',
-          onChanged: (amount) => viewModel.setAmount(amount),
-          onClear: () => viewModel.clearAmount(),
+          onChanged: (amount) => _viewModel.setAmount(amount),
+          onClear: () => _viewModel.clearAmount(),
         ),
         const SizedBox(height: 16.0),
 
         // 税込み、税別の切り替えスイッチ
         LabeledSwitch(
           label: '金額は税別価格ですか？',
-          value: state.isTaxRequired,
-          onChanged: (_) => viewModel.toggleTax(),
+          value: _state.isTaxRequired,
+          onChanged: (_) => _viewModel.toggleTax(),
         ),
         const SizedBox(height: 16.0),
 
         // 税率入力フォーム
         OneLineTextFormField(
-          controller: _taxRateController,
-          enabled: state.isTaxRequired,
+          controller: useTextEditingController(),
+          enabled: _state.isTaxRequired,
           label: '税率(％)',
           hint: '税率を入力してください。',
-          onChanged: (taxRate) => viewModel.setTaxRate(taxRate),
-          onClear: () => viewModel.clearTaxRate(),
+          onChanged: (taxRate) => _viewModel.setTaxRate(taxRate),
+          onClear: () => _viewModel.clearTaxRate(),
         ),
         const SizedBox(height: 16.0),
 
         // 人数入力フォーム
         OneLineTextFormField(
-          controller: _numberController,
+          controller: useTextEditingController(),
           label: '人数(人)',
           hint: '人数を入力してください。',
-          onChanged: (number) => viewModel.setNumber(number),
-          onClear: () => viewModel.clearNumber(),
+          onChanged: (number) => _viewModel.setNumber(number),
+          onClear: () => _viewModel.clearNumber(),
         ),
         const SizedBox(height: 32.0),
 
         ElevatedButton(
-          onPressed: !viewModel.isCalculable() ? null :
-            () => viewModel.calculateAmountPerPerson(
+          onPressed: !_viewModel.isCalculable() ? null :
+            () => _viewModel.calculateAmountPerPerson(
               onSuccess: (result) => _showResultDialog(context, result),
             ),
           child: const Text('計算する'),
@@ -97,6 +76,7 @@ class _WarikanCalculatorBodyState extends State<WarikanCalculatorBody> {
     );
   }
 
+  /// 計算結果表示するダイアログを作成する。
   void _showResultDialog(
     BuildContext context,
     int result,
